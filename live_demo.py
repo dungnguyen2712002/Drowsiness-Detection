@@ -9,8 +9,7 @@ import pickle
 import matplotlib.pyplot as plt
 from preprocess_data import filter_col
 
-
-filename = 'finalized_model.sav'
+filename = 'final_model.sav'
 frame_to_keep = 150
 font = cv2.FONT_HERSHEY_SIMPLEX
 bottomLeftCornerOfText = (10, 400)
@@ -87,18 +86,11 @@ def live():
                 data.append(frame_data)
                 if len(data) == frame_to_keep:
                     mood = model(data)
-<<<<<<< HEAD
                     print(mood)
                     if mood == '0':
                         state = 'Alert'
                     # elif mood == '5':
                     #     state = 'Normal'
-=======
-                    if mood == '0':
-                        state = 'Alert'
-                    elif mood == '5':
-                        state = 'Normal'
->>>>>>> bb908a6b9eb11718456abc1af768b7ce6614d460
                     else:
                         state = 'Drowsy'
                     # cv2.putText(image, state, bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
