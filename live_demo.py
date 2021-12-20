@@ -1,13 +1,12 @@
 import cv2
 import dlib
 from imutils import face_utils
-import pandas as pd
 import numpy as np
 import os
 import time
 import pickle
 from preprocess_data import filter_col_live
-# import keras
+import pandas as pd
 import winsound
 
 filename = 'svm_5shalf.sav'
@@ -37,18 +36,15 @@ def model(landmarks, lstm=False):
     df.interpolate(inplace=True, limit_direction='both')
     df = filter_col_live(df)
     df = df.drop('mood', axis=1)
-    if lstm:
-        # loaded_model = keras.models.load_model("lstm_100.h5")
-        X = df.to_numpy()
-        X = np.reshape(X, (-1, frame_to_keep, X.shape[1]))
-    else:
-        loaded_model = pickle.load(open(filename, 'rb'))
-        X = df.to_numpy().flatten().reshape(1, -1)
+    loaded_model = pickle.load(open(filename, 'rb'))
+    X = df.to_numpy().flatten().reshape(1, -1)
     ypred = loaded_model.predict(X)
     return ypred[0]
 
 def live():
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     # data = np.full((frame_to_keep-30, 137), -1).tolist()
     data = []
     result = []
@@ -85,6 +81,9 @@ def live():
         elif len(rects) >= 1:
             rect = rects[0]
 
+            cv2.rectangle(image, (rect.left(), rect.top()),
+                          (rect.right(), rect.bottom()), (0, 255, 0), 1)
+
             # Make the prediction and transfom it to numpy array
             shape = predictor(gray, rect)
             shape = face_utils.shape_to_np(shape)
@@ -99,7 +98,7 @@ def live():
                     # elif mood == '5':
                     #     state = 'Normal'
                     else:
-                        winsound.PlaySound(sound_path, winsound.SND_ASYNC)
+                        # winsound.PlaySound(sound_path, winsound.SND_ASYNC)
                         state = 'DROWSINESS ALERT!'
                         data = []
                     print(state)
